@@ -1,0 +1,21 @@
+.card {
+    width: 100%;
+    img, video {
+        width: 100%;
+        margin: 10px 0;
+    }
+}
+.card-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.card-bottom {
+    padding: var(--bs-card-cap-padding-y) var(--bs-card-cap-padding-x);
+    margin-bottom: 0;
+    color: var(--bs-card-cap-color);
+    background-color: var(--bs-card-cap-bg);
+    border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);
+    display: flex;
+    justify-content: space-between;
+}
