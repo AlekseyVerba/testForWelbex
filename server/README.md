@@ -1,73 +1,398 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
-
-```bash
-$ npm install
+## Интерфейсы
+- IUser
+```json
+{
+    "id": "number",
+    "name": "string",
+    "entries": "IEntry[]"
+}
 ```
 
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+- IEntry
+```json
+{
+    "id": "number",
+    "message": "string",
+    "files": "string[]",
+    "createdAt": "Date",
+    "user": "IUser"
+}
 ```
 
-## Test
+## Список API endpoint
 
-```bash
-# unit tests
-$ npm run test
+**auth**
+    
+**POST** /auth/registration - **Регистрация пользователя**
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```json
+{
+    "name": {
+        "required": true,
+        "minLength": 3,
+        "type": "string"
+    },
+    "password": {
+        "required": true,
+        "minLength": 3,
+        "maxLength": 15,
+        "type": "string"
+    }
+}
 ```
 
-## Support
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+EXAMPLE:
+```json
+{
+  "name": "user",
+  "password": "qwerty1234",
+}
+```
 
-## Stay in touch
+RETURN:
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+STATUS: 201 - Пользователь успешно создан
+```json
+{
+  "status": true,
+  "message": "Успешно",
+}
+```
 
-## License
+ИЛИ
 
-Nest is [MIT licensed](LICENSE).
+STATUS: 409 - Пользователь уже существует
+```json
+{
+  "status": false,
+  "message": "Пользователь с данным name уже существует"
+}
+```
+
+---
+**POST** /auth/login - **Вход в систему**
+
+```json
+{
+    "name": {
+        "required": true,
+        "minLength": 3,
+        "type": "string"
+    },
+    "password": {
+        "required": true,
+        "minLength": 3,
+        "maxLength": 15,
+        "type": "string"
+    }
+}
+```
+
+EXAMPLE:
+```json
+{
+  "name": "user",
+  "password": "qwerty1234",
+}
+```
+
+RETURN:
+
+STATUS: 201 - Данные верны
+```json
+{
+  "status": true,
+  "message": "Успешно",
+  "data": {
+      "user": IUser,
+      "token": "string"
+  }
+}
+```
+
+ИЛИ
+
+STATUS: 400 - Данные не верны
+```json
+{
+  "status": false,
+  "message": "Неверные данные"
+}
+```
+
+---
+**GET** /auth/check - **Проверка пользователя на авторизованность**
+  
+  HEADER: ```Authorization: Bearer {token}```
+
+RETURN:
+
+STATUS: 200 - Пользователь авторизован
+
+```json
+{
+  "status": true,
+  "message": "Успешно",
+  "data": {
+      "user": IUser,
+      "token": "string"
+  }
+}
+```
+
+ИЛИ
+
+STATUS: 403 - Пользователь не авторизован
+```json
+{
+   "statusCode": 403,
+    "message": "Forbidden resource",
+    "error": "Forbidden"
+}
+```
+
+**entry**
+
+
+---
+**GET** /entry?offset=10&limit=10 - **Получить записи**
+- 
+- **offset, limit** - опциональны
+- **offset** - отступ поиска
+- **limit** - количество записей
+
+
+RETURN:
+
+STATUS: 200 - Записи получены
+```json
+{
+    "status": true,
+    "message": "Успешно",
+    data: IEntry[]
+}
+```
+
+---
+**GET** /entry/{id} - **Получить запись по id**
+  
+  RETURN:
+
+STATUS: 200 - Запись получена
+  ```json
+{
+    "status": true,
+    "message": "Успешно",
+    data: IEntry
+}
+```
+
+ИЛИ
+
+STATUS: 404 - Пост не найден
+```json
+{
+  "status": false,
+  "message": "Пост не найден"
+}
+```
+
+---
+**POST** /entry/create - **Создать запись**
+
+**Необходима авторизация**
+  HEADER: ```Authorization: Bearer {token}``` 
+
+```json
+{
+    "message": {
+        "required": false,
+        "type": "string"
+    },
+    "files": {
+        "required": false,
+        "type": File[],
+        "max": 5
+    }
+}
+```
+
+EXAMPLE:
+```json
+{
+  "message": "Тестовая запись",
+  "files": [
+      {
+        "fieldname": "files",
+        "originalname": 'wallpaperbetter (1).jpg',
+        "encoding": '7bit',
+        "mimetype": 'image/jpeg',
+        "buffer": <Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 01 00 00 01 00 01 00 00 ff db 00 84 00 04 04 04 04 04 04 05 05 05 05 07 07 06 07 07 0a 09 08 08 09 0a 0f 
+    0a 0b 0a ... 122477 more bytes>,
+        "size": 122527
+      },
+      {
+        "fieldname": 'files',
+        "originalname": 'wallpaperbetter.jpg',
+        "encoding": '7bit',
+        "mimetype": 'image/jpeg',
+        "buffer": <Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 01 00 00 01 00 01 00 00 ff db 00 84 00 05 05 05 05 05 05 05 06 06 05 08 08 07 08 08 0b 0a 09 09 0a 0b 11 
+    0c 0d 0c ... 426348 more bytes>,
+        size: 426398
+      }
+  ],
+}
+```
+
+  RETURN:
+
+STATUS: 201 - Запись создана
+  ```json
+{
+    "status": true,
+    "message": "Успешно",
+    "data": IEntry
+}
+```
+
+
+---
+**PUT** /entry/{id} - **Редактировать запись**
+
+**Необходима авторизация**
+  HEADER: ```Authorization: Bearer {token}``` 
+  
+  ```json
+{
+    "message": {
+        "required": false,
+        "type": "string"
+    },
+    "files": {
+        "required": false,
+        "type": File[],
+        "max": 5
+    }
+}
+```
+
+EXAMPLE:
+```json
+{
+  "message": "Тестовая запись",
+  "files": [
+      {
+        "fieldname": "files",
+        "originalname": 'wallpaperbetter (1).jpg',
+        "encoding": '7bit',
+        "mimetype": 'image/jpeg',
+        "buffer": <Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 01 00 00 01 00 01 00 00 ff db 00 84 00 04 04 04 04 04 04 05 05 05 05 07 07 06 07 07 0a 09 08 08 09 0a 0f 
+    0a 0b 0a ... 122477 more bytes>,
+        "size": 122527
+      },
+      {
+        "fieldname": 'files',
+        "originalname": 'wallpaperbetter.jpg',
+        "encoding": '7bit',
+        "mimetype": 'image/jpeg',
+        "buffer": <Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 01 00 00 01 00 01 00 00 ff db 00 84 00 05 05 05 05 05 05 05 06 06 05 08 08 07 08 08 0b 0a 09 09 0a 0b 11 
+    0c 0d 0c ... 426348 more bytes>,
+        size: 426398
+      }
+  ],
+}
+```
+
+  RETURN:
+
+STATUS: 201 - Запись редактирована
+  ```json
+{
+    "status": true,
+    "message": "Успешно",
+    "data": IEntry
+}
+```
+
+ИЛИ
+
+STATUS: 404 - Не найдена запись, либо у вас нету прав
+  ```json
+{
+    "status": false,
+    "message": "Не найдена запись, либо у вас нету прав",
+}
+```
+
+---
+**DELETE** /entry/{id} - **Удалить запись**
+
+**Необходима авторизация**
+  HEADER: ```Authorization: Bearer {token}``` 
+
+
+  RETURN:
+
+STATUS: 200 - Запись удалена
+  ```json
+{
+    "status": true,
+    "message": "Успешно",
+}
+```
+
+ИЛИ
+
+STATUS: 404 - Не найдена запись, либо у вас нету прав
+  ```json
+{
+    "status": false,
+    "message": "Не найдена запись, либо у вас нету прав",
+}
+```
+
+
+---
+**DELETE** /entry/delete-file/{id} - **Удалить файл у записи**
+**Необходима авторизация**
+  HEADER: ```Authorization: Bearer {token}``` 
+
+  ```json
+{
+    "path": {
+        "required": true,
+        "type": "string"
+    }
+}
+```
+
+EXAMPLE:
+
+  ```json
+{
+    "path": "jpg/dhdnsfwtyewryer.jpg"
+}
+```
+
+  RETURN:
+
+STATUS: 200 - Файл удален
+  ```json
+{
+    "status": true,
+    "message": "Успешно",
+}
+```
+
+ИЛИ
+
+STATUS: 404 - Файл не найден
+  ```json
+{
+    "status": false,
+    "message": "Файл не найден",
+}
+```
+
+

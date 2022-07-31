@@ -29,7 +29,11 @@ export class EntryService {
         let filesPath: string[] = []
 
         if (files) {
-            filesPath = files.map(this.fileService.createFile)
+            try {
+                filesPath = files.map(this.fileService.createFile)
+            } catch(e) {
+
+            }
         }
 
         const newEntry = Object.assign(new Entry(), createEntityDto, {files: filesPath, user: userID})
@@ -61,7 +65,9 @@ export class EntryService {
         let filesPath: string[] = []
 
         if (files) {
-            filesPath = files.map(this.fileService.createFile)
+            try {
+                filesPath = files.map(this.fileService.createFile)
+            } catch(e) {}
         }
 
         entry.files = [...entry.files, ...filesPath]
@@ -87,7 +93,9 @@ export class EntryService {
         }
 
         if (entry.files.length > 0) {
-            entry.files.forEach(this.fileService.deleteFile)
+            try {
+                entry.files.forEach(this.fileService.deleteFile)
+            } catch(e) {}
         }
 
         await this.entryRepository.delete(entry.id)
